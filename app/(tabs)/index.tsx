@@ -5,7 +5,7 @@ import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Button, ButtonText } from "@/components/ui/button";
-import { Link } from "expo-router";
+import { JSX } from "react";
 
 // const someButton = () => {
 //   return (
@@ -20,12 +20,28 @@ export default function HomeScreen() {
     return (
       <>
         <Button
-          className="rounded-full"
+          className="rounded-full mt-3"
           size="lg"
           variant="solid"
           action="primary"
+          style={styles.actionButton} // added width for consistent sizing
         >
           <ButtonText>Sign in with Email!</ButtonText>
+        </Button>
+      </>
+    );
+  };
+
+  const NewButton = ({ text }: { text: string | JSX.Element }) => {
+    return (
+      <>
+        <Button
+          className="rounded-full"
+          size="lg"
+          variant="outline"
+          style={styles.newButton} // make each button ~48% width
+        >
+          <ButtonText>{text}</ButtonText>
         </Button>
       </>
     );
@@ -45,45 +61,15 @@ export default function HomeScreen() {
           </ThemedView>
         }
       >
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">
+        <ThemedView style={styles.stepContainer}>
+          <ThemedText type="title" className="mx-3">
             The best financial planning app that you will need!
           </ThemedText>
-        </ThemedView>
-        <ThemedView style={styles.stepContainer}>
           <LoginButton></LoginButton>
         </ThemedView>
-        <ThemedView style={styles.stepContainer}>
-          <Link href="/modal">
-            <Link.Trigger>
-              <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-            </Link.Trigger>
-            <Link.Preview />
-            <Link.Menu>
-              <Link.MenuAction
-                title="Action"
-                icon="cube"
-                onPress={() => alert("Action pressed")}
-              />
-              <Link.MenuAction
-                title="Share"
-                icon="square.and.arrow.up"
-                onPress={() => alert("Share pressed")}
-              />
-              <Link.Menu title="More" icon="ellipsis">
-                <Link.MenuAction
-                  title="Delete"
-                  icon="trash"
-                  destructive
-                  onPress={() => alert("Delete pressed")}
-                />
-              </Link.Menu>
-            </Link.Menu>
-          </Link>
-
-          <ThemedText>
-            {`Tap the Explore tab to learn more about what's included in this starter app.`}
-          </ThemedText>
+        <ThemedView style={styles.secondStepContainer}>
+          <NewButton text="Google"></NewButton>
+          <NewButton text="Outlook"></NewButton>
         </ThemedView>
         <ThemedView style={styles.stepContainer}>
           <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
@@ -112,6 +98,16 @@ const styles = StyleSheet.create({
   stepContainer: {
     gap: 8,
     marginBottom: 8,
+    alignItems: "center", // center the sign-in button
+  },
+  secondStepContainer: {
+    gap: 10,
+    marginTop: 8,
+    // removed flex: 1 to avoid forcing full height
+    flexDirection: "row",
+    justifyContent: "space-between", // space the two buttons evenly
+    width: "100%", // match the sign-in container width
+    alignSelf: "center",
   },
   headerImageContainer: {
     flex: 1,
@@ -121,9 +117,16 @@ const styles = StyleSheet.create({
   },
   headerTextContainer: {},
   reactLogo: {
-    height: 280,
+    height: 400,
     width: "85%",
     maxWidth: 480,
     aspectRatio: 16 / 9,
+    marginTop: 70,
+  },
+  actionButton: {
+    width: "95%", // width for the Sign in with Email button
+  },
+  newButton: {
+    width: "47%", // each of the two buttons will be ~48% so together match actionButton
   },
 });
