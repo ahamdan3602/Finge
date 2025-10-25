@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Button, ButtonText } from "@/components/ui/button";
 import { JSX } from "react";
+import { GoogleAuthProvider } from "firebase/auth";
 
 // const someButton = () => {
 //   return (
@@ -16,6 +17,9 @@ import { JSX } from "react";
 // };
 
 export default function HomeScreen() {
+
+  const provider = new GoogleAuthProvider(); 
+  // provider.addScope('https://www.googleapis.com/auth/chat.admin.spaces') 
   const LoginButton = () => {
     return (
       <>
