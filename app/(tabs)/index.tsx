@@ -32,7 +32,13 @@ export default function HomeScreen() {
     );
   };
 
-  const NewButton = ({ text }: { text: string | JSX.Element }) => {
+  const NewButton = ({
+    text,
+    image,
+  }: {
+    text: string | JSX.Element;
+    image?: any; // expect a static require(...) module or a remote { uri }
+  }) => {
     return (
       <>
         <Button
@@ -41,13 +47,28 @@ export default function HomeScreen() {
           variant="outline"
           style={styles.newButton} // make each button ~48% width
         >
-          <ButtonText>{text}</ButtonText>
+          <ButtonText style={styles.buttonTextContent}>
+            {image ? (
+              <Image
+                source={image}
+                style={{
+                  width: 18,
+                  height: 18,
+                  marginRight: 8,
+                  alignSelf: "flex-end", // moves just the image down within the button
+                }}
+                contentFit="contain"
+              />
+            ) : null}
+            {text}
+          </ButtonText>
         </Button>
       </>
     );
   };
+
   return (
-    <div className="flex-col bg-#D3D3D3">
+    <ThemedView style={{ flex: 1, flexDirection: "column" }}>
       <ParallaxScrollView
         headerBackgroundColor={{ light: "#FFFFFF", dark: "#000000" }}
         headerImage={
@@ -63,7 +84,7 @@ export default function HomeScreen() {
       >
         <ThemedView style={styles.stepContainer}>
           <ThemedText type="title" className="mx-3 text-4xl">
-            The best financial planning <br />
+            The best financial planning {"\n"}
             app you need!
           </ThemedText>
         </ThemedView>
@@ -71,8 +92,15 @@ export default function HomeScreen() {
           <LoginButton></LoginButton>
 
           <ThemedView style={styles.secondStepContainer}>
-            <NewButton text="Google"></NewButton>
-            <NewButton text="Outlook"></NewButton>
+            {/* Fixed the outlook filename */}
+            <NewButton
+              image={require("@/assets/images/icons8-google.svg")}
+              text="Google"
+            ></NewButton>
+            <NewButton
+              image={require("@/assets/images/icons8-outlook-2025.svg")}
+              text="Outlook"
+            ></NewButton>
           </ThemedView>
           <ThemedView style={styles.secondStepContainer}>
             <ThemedText style={styles.userText}>
@@ -81,7 +109,7 @@ export default function HomeScreen() {
           </ThemedView>
         </ThemedView>
       </ParallaxScrollView>
-    </div>
+    </ThemedView>
   );
 }
 
@@ -131,6 +159,14 @@ const styles = StyleSheet.create({
   },
   newButton: {
     width: "47%", // each of the two buttons will be ~48% so together match actionButton
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonTextContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
   },
   userText: {
     color: "#d3d3d3",
