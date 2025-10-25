@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between", // space the two buttons evenly
     width: "100%", // match the sign-in container width
-    alignSelf: "center",
+    alignSelf: "auto",
   },
   headerImageContainer: {
     flex: 1,
