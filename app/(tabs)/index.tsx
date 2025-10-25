@@ -47,21 +47,16 @@ export default function HomeScreen() {
           variant="outline"
           style={styles.newButton} // make each button ~48% width
         >
-          <ButtonText style={styles.buttonTextContent}>
-            {image ? (
-              <Image
-                source={image}
-                style={{
-                  width: 18,
-                  height: 18,
-                  marginRight: 8,
-                  alignSelf: "flex-end", // moves just the image down within the button
-                }}
-                contentFit="contain"
-              />
-            ) : null}
-            {text}
-          </ButtonText>
+          <Image
+            source={image}
+            style={{
+              width: 18,
+              height: 18,
+              marginRight: 8, // moves just the image down within the button
+            }}
+            contentFit="contain"
+          />
+          <ButtonText style={styles.buttonTextContent}>{text}</ButtonText>
         </Button>
       </>
     );
@@ -155,18 +150,17 @@ const styles = StyleSheet.create({
     height: 320, // prevents overflow while allowing a larger logo
   },
   actionButton: {
-    width: "95%", // width for the Sign in with Email button
+    width: "100%", // width for the Sign in with Email button
   },
   newButton: {
     width: "47%", // each of the two buttons will be ~48% so together match actionButton
-    alignItems: "center",
+    display: "flex",
+    flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
   },
   buttonTextContent: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
   },
   userText: {
     color: "#d3d3d3",
