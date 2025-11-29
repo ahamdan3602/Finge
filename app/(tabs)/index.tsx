@@ -2,24 +2,20 @@ import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
 
 import ParallaxScrollView from "@/components/parallax-scroll-view";
+import {
+  googleAuthentication,
+  microsoftAuthentication, // Add Google authentication import
+  useAuthRedirect,
+} from "@/components/signin-provider";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Button, ButtonText } from "@/components/ui/button";
 import { JSX } from "react";
-import { GoogleAuthProvider } from "firebase/auth";
-
-// const someButton = () => {
-//   return (
-//     <Button variant="solid" size="md" action="primary">
-//       <ButtonText>Hello World! My name is ...</ButtonText>
-//     </Button>
-//   );
-// };
 
 export default function HomeScreen() {
+  // Check for authentication redirect result
+  const authResult = useAuthRedirect();
 
-  const provider = new GoogleAuthProvider(); 
-  // provider.addScope('https://www.googleapis.com/auth/chat.admin.spaces') 
   const LoginButton = () => {
     return (
       <>
@@ -28,7 +24,7 @@ export default function HomeScreen() {
           size="lg"
           variant="solid"
           action="primary"
-          style={styles.actionButton} // added width for consistent sizing
+          style={styles.actionButton}
         >
           <ButtonText>Sign in with Email!</ButtonText>
         </Button>
@@ -39,9 +35,11 @@ export default function HomeScreen() {
   const NewButton = ({
     text,
     image,
+    onPress,
   }: {
     text: string | JSX.Element;
-    image?: any; // expect a static require(...) module or a remote { uri }
+    image?: any;
+    onPress?: () => void;
   }) => {
     return (
       <>
@@ -49,14 +47,15 @@ export default function HomeScreen() {
           className="rounded-full"
           size="lg"
           variant="outline"
-          style={styles.newButton} // make each button ~48% width
+          style={styles.newButton}
+          onPress={onPress} // Add onPress handler
         >
           <Image
             source={image}
             style={{
               width: 18,
               height: 18,
-              marginRight: 8, // moves just the image down within the button
+              marginRight: 8,
             }}
             contentFit="contain"
           />
@@ -91,15 +90,16 @@ export default function HomeScreen() {
           <LoginButton></LoginButton>
 
           <ThemedView style={styles.secondStepContainer}>
-            {/* Fixed the outlook filename */}
             <NewButton
               image={require("@/assets/images/icons8-google.svg")}
               text="Google"
-            ></NewButton>
+              onPress={googleAuthentication} // Add Google auth onPress
+            />
             <NewButton
               image={require("@/assets/images/icons8-outlook-2025.svg")}
               text="Outlook"
-            ></NewButton>
+              onPress={microsoftAuthentication} // Call Microsoft auth when pressed
+            />
           </ThemedView>
           <ThemedView style={styles.secondStepContainer}>
             <ThemedText style={styles.userText}>
