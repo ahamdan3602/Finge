@@ -12,6 +12,7 @@ import { Platform, StyleSheet } from "react-native";
 
 
 // mock commit
+// mock commit 2
 const googleAuthentication = async () => {
   try {
     if (Platform.OS == "web") {
