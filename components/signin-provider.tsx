@@ -1,13 +1,10 @@
 import { Button, ButtonText } from "@/components/ui/button";
 import { auth, googleProvider, microsoftProvider } from "@/firebaseConfig"; // Add googleProvider import
 import { Image } from "expo-image";
-import {
-  getRedirectResult,
-  signInWithPopup,
-  signInWithRedirect,
-} from "firebase/auth";
-import { JSX, useEffect, useState } from "react";
-import { Platform, StyleSheet } from "react-native";
+import { signInWithRedirect } from "firebase/auth";
+
+import { JSX } from "react";
+import { StyleSheet } from "react-native";
 
 const microsoftAuthentication = async () => {
   try {
@@ -82,6 +79,21 @@ export const useAuthRedirect = () => {
   return authResult;
 };
 
+const googleButton = ({
+  text,
+  image,
+}: {
+  text: string | JSX.Element;
+  image?: any;
+}) => {
+  return (
+    <Button onPress={googleAuthentication}>
+      {image && <Image source={image} style={{ width: 20, height: 20 }} />}
+      <ButtonText>{text}</ButtonText>
+    </Button>
+  );
+};
+
 const newButton = ({
   text,
   image,
@@ -124,6 +136,3 @@ const styles = StyleSheet.create({
     color: "#d3d3d3",
   },
 });
-
-// Export the components and functions
-export { googleAuthentication, microsoftAuthentication, newButton };
