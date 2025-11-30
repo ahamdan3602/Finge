@@ -1,28 +1,20 @@
 import { Button, ButtonText } from "@/components/ui/button";
-import { auth, googleProvider, microsoftProvider } from "@/firebaseConfig"; // Add googleProvider import
-// import dotenv from "dotenv";
+import { auth, googleProvider, microsoftProvider } from "@/firebaseConfig";
 import { Image } from "expo-image";
 import {
   getRedirectResult,
   signInWithPopup,
   signInWithRedirect,
 } from "firebase/auth";
-import mongoose from "mongoose";
 import { JSX, useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 
-const API_URL = "http://localhost:3000"; // backend
-const MONGODB_URI = process.env.DATABASE_URL || "";
-
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => console.log("Successfully connect to mongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+const API_URL = "http://localhost:3000"; // Use port 3001 to avoid conflicts
 
 const saveUser = async (userData: {
   displayName: string | null;
   email: string | null;
-  age: string | null;
+  uid: string | null;
 }) => {
   try {
     const res = await fetch(`${API_URL}/api/users`, {
@@ -33,26 +25,34 @@ const saveUser = async (userData: {
       body: JSON.stringify({
         displayName: userData.displayName,
         email: userData.email,
-        age: userData.age,
+        uid: userData.uid,
       }),
     });
     const result = await res.json();
+    console.log("User saved to backend:", result);
     return result;
   } catch (error) {
     console.error("Error saving user:", error);
     throw error;
   }
 };
-const microsoftAuthentication = async () => {
+
+// Export these functions so they can be used in other components
+export const microsoftAuthentication = async () => {
   try {
     if (Platform.OS === "web") {
-      // Web: Use popup
       const result = await signInWithPopup(auth, microsoftProvider);
       console.log("User signed in:", result.user.displayName);
 
+      // Save to backend via API
+      await saveUser({
+        displayName: result.user.displayName,
+        email: result.user.email,
+        uid: result.user.uid,
+      });
+
       return result;
     } else {
-      // Mobile (iOS/Android): Use redirect
       await signInWithRedirect(auth, microsoftProvider);
     }
   } catch (error) {
@@ -60,29 +60,38 @@ const microsoftAuthentication = async () => {
   }
 };
 
-const googleAuthentication = async () => {
+export const googleAuthentication = async () => {
   try {
     if (Platform.OS === "web") {
-      // Web: Use popup
-      console.log(Platform.OS);
+      console.log("Platform:", Platform.OS);
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-      const { displayName, email } = user;
+      const { displayName, email, uid } = user;
 
+      console.log("Google sign-in successful:", displayName, email);
+
+      // Save to backend via API instead of direct MongoDB
       await saveUser({
         displayName: displayName,
         email: email,
-        age: "18",
+        uid: uid,
       });
 
       console.log("Google User signed in:", result.user.displayName);
       return result;
     } else {
-      // Mobile (iOS/Android): Use redirect
+      console.log("Mobile platform, using redirect");
       await signInWithRedirect(auth, googleProvider);
     }
   } catch (error) {
     console.error("Google sign-in error:", error);
+    // Log more detailed error information
+    if (error.code) {
+      console.error("Error code:", error.code);
+    }
+    if (error.message) {
+      console.error("Error message:", error.message);
+    }
   }
 };
 
@@ -126,6 +135,7 @@ export const useAuthRedirect = () => {
   return authResult;
 };
 
+// Keep these for internal use if needed
 const googleButton = ({
   text,
   image,
@@ -147,8 +157,8 @@ const newButton = ({
   onPress,
 }: {
   text: string | JSX.Element;
-  image?: any; // expect a static require(...) module or a remote { uri }
-  onPress?: () => void; // Add onPress prop
+  image?: any;
+  onPress?: () => void;
 }) => {
   return (
     <>
@@ -156,8 +166,8 @@ const newButton = ({
         className="rounded-full"
         size="lg"
         variant="outline"
-        style={styles.newButton} // make each button ~48% width
-        onPress={onPress} // Add onPress handler
+        style={styles.newButton}
+        onPress={onPress}
       >
         <Image
           source={image}
@@ -172,7 +182,7 @@ const newButton = ({
 
 const styles = StyleSheet.create({
   newButton: {
-    width: "47%", // each of the two buttons will be ~48% so together match actionButton
+    width: "47%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
@@ -183,3 +193,6 @@ const styles = StyleSheet.create({
     color: "#d3d3d3",
   },
 });
+
+// Export the button components as well if needed
+export { googleButton, newButton };

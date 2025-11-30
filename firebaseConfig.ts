@@ -19,8 +19,7 @@ const auth = getAuth(app);
 
 const googleProvider = new GoogleAuthProvider();
 const microsoftProvider = new OAuthProvider("microsoft.com");
-googleProvider.addScope("profile");
-googleProvider.addScope("email");
+
 microsoftProvider.addScope("profile");
 microsoftProvider.addScope("email");
 

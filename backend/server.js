@@ -1,63 +1,93 @@
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
-import { run } from "./mongoConfig.js";
 import User from "./user.model.js";
 
 dotenv.config();
 const MONGODB_URI = process.env.DATABASE_URL || "";
 
 const app = express();
-const PORT = 3000;
+const PORT = 3000; // Changed to avoid conflicts
 
+// CORS middleware MUST come before other middleware
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
+
+  // Handle preflight requests
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
 });
+
+// Body parser middleware
 app.use(express.json());
 
-run();
+// Remove the separate mongoConfig run() - use only mongoose
+// Connect to MongoDB with better error handling
 mongoose
   .connect(MONGODB_URI)
-  .then(() => console.log("Successfully connect to mongoDB"))
+  .then(() => console.log("Successfully connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
-
-// Add basic middlewarex
 
 // Basic route
 app.get("/", (req, res) => {
   res.send("Server is running!");
 });
 
-// Post request to save user
-app.post("/api/users", (req, res) => {
-  const { displayName, email, age } = req.body;
-  if (!req.body || Object.keys(req.body).length === 0) {
-    return res.status(400).send({ message: "Content cannot be empty." });
-  } else {
-    User.findOrCreate(
-      { name: displayName, email: email, age: age },
-      (err, user) => {
-        if (err) {
-          return res
-            .status(500)
-            .send({ message: "Internal Server Error: 500" });
-        }
-        return res.status(201).send({ message: "User saved", user });
-      }
-    );
+// Fixed POST route - was /api/:users (wrong), should be /api/users
+app.post("/api/users", async (req, res) => {
+  try {
+    console.log("Received request:", req.body);
+
+    const { displayName, email, uid } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email: email });
+
+    if (!user) {
+      // Create new user
+      user = new User({
+        username: displayName || "Unknown User",
+        email: email,
+        uid: uid,
+        age: "18", // Default age
+      });
+      await user.save();
+      console.log("User created:", user);
+      return res.status(201).json({ message: "User created", user });
+    } else {
+      console.log("User exists:", user);
+      return res.status(200).json({ message: "User already exists", user });
+    }
+  } catch (error) {
+    console.error("Error saving user:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 });
 
-app.listen(PORT, async (err) => {
+// GET users endpoint
+app.get("/api/users", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching users", error: error.message });
+  }
+});
+
+app.listen(PORT, (err) => {
   if (err) console.log("Error in server setup");
-  console.log("Server listening on Port", PORT);
-  const newUser = new User({
-    username: "Alice",
-    email: "alice@example.com",
-    age: 30,
-  });
-  // await newUser.save();
+  console.log(`Server listening on http://localhost:${PORT}`);
 });
