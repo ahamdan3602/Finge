@@ -1,11 +1,9 @@
-import dotenv from "dotenv";
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
-dotenv.config();
 
 const firebaseConfig = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  apiKey: "AIzaSyBLMUvkxDGv0YKiRHMmuzK5IUz6riW_znw",
+  authDomain: "finge-193b7.firebaseapp.com",
   projectId: "finge-193b7",
   storageBucket: "finge-193b7.firebasestorage.app",
   messagingSenderId: "733644751897",
@@ -21,8 +19,8 @@ const auth = getAuth(app);
 
 const googleProvider = new GoogleAuthProvider();
 const microsoftProvider = new OAuthProvider("microsoft.com");
-googleProvider.addScope('profile');
-googleProvider.addScope('email');
+googleProvider.addScope("profile");
+googleProvider.addScope("email");
 microsoftProvider.addScope("profile");
 microsoftProvider.addScope("email");
 
